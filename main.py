@@ -1,24 +1,36 @@
 import numpy as np
 import config
 class EMT:
-    def __init__(self,numNodes):
-        self.numNodes=numNodes
-        self.G = np.zeros((self.numNodes,self.numNodes))
+    def __init__(self):
         self.list = [] 
+        # appending elements to list  
+        self.list.append(Branch("L",1,0,0,0,500e-6)) 
+        self.list.append(Branch("R",2,1,0,0,100)) 
+        self.list.append(Branch("S",3,2,0,0,10)) 
+        self.list.append(Branch("C",3,0,0,0,100e-6))
+
+        #max node number
+        maxnode=0
+        for obj in self.list:
+            From = obj.strnode
+            To = obj.stpnode
+            if From > maxnode:
+                maxnode=From
+            if To > maxnode:
+                maxnode=To
+        print("maxnode",maxnode)
+        self.numNodes=maxnode
+
+        self.G = np.zeros((self.numNodes,self.numNodes))
+
         self.I_History=[]
-        
         for i in range(self.numNodes):
             self.I_History.append(0)
 
+
     # Initialize [G] matrix to zero
     def formG(self):
-        for i in range(self.numNodes):
-            # appending instances to list  
-            self.list.append(Branch("L",1,0,0,0,500e-6)) 
-            self.list.append(Branch("R",2,1,0,0,100)) 
-            self.list.append(Branch("S",3,2,0,0,10)) 
-            self.list.append(Branch("C",3,0,0,0,100e-6))
-
+        
         for obj in self.list:
             Type = obj.brnType
             From = obj.strnode
@@ -36,7 +48,8 @@ class EMT:
             if To==0:
                 print("*** Both Nodes Zero ***")
 
-
+            To=To-1
+            From=From-1
             if obj.Series==1:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
                 self.G[From,From] = self.G[From,From] + 1/obj.Reff
@@ -44,8 +57,29 @@ class EMT:
                 self.G[To,From] = self.G[To,From] - 1/obj.Reff
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
+            
+        print(self.G)
         
-        return self.G, len(self.list)
+        return self.G
+
+
+    def kronR(self):
+        for obj in self.list:
+            Type = obj.brnType
+            if Type=="S":
+                k=obj.stpnode
+        print(self.G)
+        for i in range(self.numNodes):
+            for j in range(self.numNodes):
+                print(i,j)
+                self.G[i][j]= self.G[i][j]- (self.G[i][k]*self.G[k][j])/self.G[k][k]
+        
+
+        self.Gk=np.delete(self.G,self.numNodes-1,0)
+        self.Gk=np.delete(self.Gk,self.numNodes-1,1)
+
+        print(self.Gk)
+
 
     def calcBrnHistory(self):
         for obj in self.list:
@@ -65,8 +99,8 @@ class EMT:
     def calcinjection(self):
         for obj in self.list:
             Type = obj.brnType
-            From = obj.strnode
-            To = obj.stpnode
+            From = obj.strnode-1
+            To = obj.stpnode-1
 
             Brn_I_History = obj.ihistory
             if obj.Series==1:
@@ -113,14 +147,22 @@ class Branch():
 
 
 #Initialize G with 4X4
-G=EMT(4)
-
+print("Create EMT object")
+G=EMT()
 # Add componets and form G matrix
-g=G.formG()
+print("Form G")
+G.formG()
 
+print("Perform Kron reduction on G")
+G.kronR()
+
+print("Calc Branch current history")
 G.calcBrnHistory()
+
+
+print("Calc current injection")
 G.calcinjection()
-print(g)
+
 
 # Update sources
 
