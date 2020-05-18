@@ -2,26 +2,31 @@ import numpy as np
 import config
 class EMT:
     def __init__(self):
-        self.list = [] 
+        self.comp_list = [] 
+        
         # appending elements to list  
-        self.list.append(Branch("L",1,0,0,0,500e-6)) 
-        self.list.append(Branch("R",2,1,0,0,100)) 
-        self.list.append(Branch("S",3,2,0,0,10)) 
-        self.list.append(Branch("C",3,0,0,0,100e-6))
+        self.comp_list.append(Branch("R",1,2,0.0,0.0,1)) 
+        self.comp_list.append(Branch("L",1,0,0.0,0.0,1e-3)) 
+        self.comp_list.append(Source("S",3,0,10,0,60.0,0.1)) 
+        self.comp_list.append(Branch("R",2,3,0.0,0.0,10))
 
         #max node number
         maxnode=0
-        for obj in self.list:
+        for obj in self.comp_list:
             From = obj.strnode
             To = obj.stpnode
             if From > maxnode:
                 maxnode=From
             if To > maxnode:
                 maxnode=To
-        print("maxnode",maxnode)
         self.numNodes=maxnode
+        self.numBranches=len(self.comp_list)
 
-        self.G = np.zeros((self.numNodes,self.numNodes))
+
+        
+        self.vol=[]
+        for i in range(self.numNodes):
+            self.vol.append(0)
 
         self.I_History=[]
         for i in range(self.numNodes):
@@ -30,23 +35,26 @@ class EMT:
 
     # Initialize [G] matrix to zero
     def formG(self):
-        
-        for obj in self.list:
+        self.G = np.zeros((self.numNodes,self.numNodes))
+        for obj in self.comp_list:
             Type = obj.brnType
             From = obj.strnode
             To = obj.stpnode
 
-            obj.Series = 1
+            if To==0 and From==0:
+                print("*** Both Nodes Zero ***")
+            Series = 1
             if To == 0:
                 To = From
-                obj.Series = 0
+                Series = 0
                 
             if From == 0:
                 From = To
-                obj.Series = 0
-                
-            if To==0:
-                print("*** Both Nodes Zero ***")
+                Series = 0
+              
+
+             
+            obj.Series=Series
 
             To=To-1
             From=From-1
@@ -59,11 +67,14 @@ class EMT:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
         print(self.G)
+        #test series and prellel
+        for obj in self.comp_list:
+            print(obj.brnType,obj.Series)
         
-        return self.G
+        
 
 
-    def kronR(self):
+    """def kronR(self):
         for obj in self.list:
             Type = obj.brnType
             if Type=="S":
@@ -78,11 +89,11 @@ class EMT:
         self.Gk=np.delete(self.G,self.numNodes-1,0)
         self.Gk=np.delete(self.Gk,self.numNodes-1,1)
 
-        print(self.Gk)
+        print(self.Gk)"""
 
 
     def calcBrnHistory(self):
-        for obj in self.list:
+        for obj in self.comp_list:
             if obj.brnType=="R":
                obj.ihistory=0
             elif obj.brnType=="S":
@@ -97,7 +108,7 @@ class EMT:
             #print(obj.ihistory)
 
     def calcinjection(self):
-        for obj in self.list:
+        for obj in self.comp_list:
             Type = obj.brnType
             From = obj.strnode-1
             To = obj.stpnode-1
@@ -113,7 +124,7 @@ class EMT:
                 elif From== 0:
                     self.I_History[From] = self.I_History[From]- Brn_I_History
                 else:
-                    print("*** Error: Both Nodes Zero ***")
+                    print("*** ***")
 
             
             
@@ -141,6 +152,21 @@ class Branch():
         else:
             print("Only R L C S elements considered")
 
+class Source():
+    def __init__(self,brnType,strnode,stpnode,magnitude,angle,frequency,value):
+        self.brnType = brnType
+        self.strnode= strnode
+        self.stpnode= stpnode
+        self.magnitude= magnitude
+        self.angle= angle
+        self.frequency= frequency
+        self.Reff=value
+    def Sourceupdate(self,TheTime):
+        V_mag = self.magnitude
+        V_ang = self.angle
+        freq = self.frequency
+        V_instantaneous = V_mag*np.sin(2.0*np.pi*50.0*TheTime + V_ang*np.pi/180.0)
+        return V_instantaneous
 
  
 
@@ -153,8 +179,8 @@ G=EMT()
 print("Form G")
 G.formG()
 
-print("Perform Kron reduction on G")
-G.kronR()
+#print("Perform Kron reduction on G")
+#G.kronR()
 
 print("Calc Branch current history")
 G.calcBrnHistory()
