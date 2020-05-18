@@ -3,11 +3,11 @@ import config
 class EMT:
     def __init__(self):
         self.comp_list = [] 
-        
+        self.S1=Source("S",3,0,10,0,60.0,0.1)
         # appending elements to list  
         self.comp_list.append(Branch("R",1,2,0.0,0.0,1)) 
         self.comp_list.append(Branch("L",1,0,0.0,0.0,1e-3)) 
-        self.comp_list.append(Source("S",3,0,10,0,60.0,0.1)) 
+        self.comp_list.append(self.S1) 
         self.comp_list.append(Branch("R",2,3,0.0,0.0,10))
 
         #max node number
@@ -32,6 +32,10 @@ class EMT:
         for i in range(self.numNodes):
             self.I_History.append(0)
 
+        self.I_History_src=[]
+        for i in range(self.numNodes):
+            self.I_History_src.append(0)
+
 
     # Initialize [G] matrix to zero
     def formG(self):
@@ -43,6 +47,10 @@ class EMT:
 
             if To==0 and From==0:
                 print("*** Both Nodes Zero ***")
+            
+            if To==From:
+                print("*** Both Nodes Same ***")
+
             Series = 1
             if To == 0:
                 To = From
@@ -67,7 +75,8 @@ class EMT:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
         print(self.G)
-        #test series and prellel
+
+        #test whether series and prellel
         for obj in self.comp_list:
             print(obj.brnType,obj.Series)
         
@@ -126,6 +135,24 @@ class EMT:
                 else:
                     print("*** ***")
 
+        print(self.I_History)
+
+    def calcnewV(self):
+        invG=np.linalg.inv(self.G)
+        self.vol=np.matmul(invG,self.I_History)
+        print("vol",self.vol)
+
+    def updateVol(self):
+        for obj in self.comp_list:
+            Type = obj.brnType
+            From = obj.strnode-1
+            To = obj.stpnode-1
+            self.I_History_src[2] = self.S1.Sourceupdate(TheTime)
+       
+        self.I_History=np.add(self.I_History,self.I_History_src)
+        
+
+        
             
             
 
@@ -174,20 +201,28 @@ class Source():
 
 #Initialize G with 4X4
 print("Create EMT object")
-G=EMT()
+EMTDC=EMT()
 # Add componets and form G matrix
 print("Form G")
-G.formG()
+EMTDC.formG()
 
-#print("Perform Kron reduction on G")
-#G.kronR()
+# go to net timestep
+TheTime=-0.0123
+#Update Sources
+EMTDC.updateVol()
 
 print("Calc Branch current history")
-G.calcBrnHistory()
+EMTDC.calcBrnHistory()
 
 
 print("Calc current injection")
-G.calcinjection()
+
+EMTDC.calcinjection()
+
+EMTDC.calcnewV()
+
+
+
 
 
 # Update sources
