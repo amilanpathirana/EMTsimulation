@@ -1,5 +1,6 @@
 import numpy as np
 import config
+
 class EMT:
     def __init__(self):
         self.comp_list = [] 
@@ -21,8 +22,6 @@ class EMT:
                 maxnode=To
         self.numNodes=maxnode
         self.numBranches=len(self.comp_list)
-
-
         
         self.vol=[]
         for i in range(self.numNodes):
@@ -36,8 +35,6 @@ class EMT:
         for i in range(self.numNodes):
             self.I_History_src.append(0)
 
-
-    # Initialize [G] matrix to zero
     def formG(self):
         self.G = np.zeros((self.numNodes,self.numNodes))
         for obj in self.comp_list:
@@ -75,32 +72,7 @@ class EMT:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
         print(self.G)
-
-        #test whether series and prellel
-        for obj in self.comp_list:
-            print(obj.brnType,obj.Series)
-        
-        
-
-
-    """def kronR(self):
-        for obj in self.list:
-            Type = obj.brnType
-            if Type=="S":
-                k=obj.stpnode
-        print(self.G)
-        for i in range(self.numNodes):
-            for j in range(self.numNodes):
-                print(i,j)
-                self.G[i][j]= self.G[i][j]- (self.G[i][k]*self.G[k][j])/self.G[k][k]
-        
-
-        self.Gk=np.delete(self.G,self.numNodes-1,0)
-        self.Gk=np.delete(self.Gk,self.numNodes-1,1)
-
-        print(self.Gk)"""
-
-
+ 
     def calcBrnHistory(self):
         for obj in self.comp_list:
             if obj.brnType=="R":
@@ -150,6 +122,24 @@ class EMT:
             self.I_History_src[2] = self.S1.Sourceupdate(TheTime)
        
         self.I_History=np.add(self.I_History,self.I_History_src)
+
+    def calcNewbranchI(self):
+        for obj in self.comp_list:
+            Type = obj.brnType
+            From = obj.strnode-1
+            To = obj.stpnode-1
+
+            V = obj.Vlast
+
+            if obj.brnType == "R":
+                obj.I_last = V/obj.Reff
+            elif obj.brnType == "S":
+                obj.I_last = V/obj.Reff
+            elif obj.brnType == "L":
+                obj.I_last = V/obj.Reff + obj.ihistory
+            elif obj.brnType == "C":
+                obj.I_last = V/obj.Reff + obj.ihistory
+
         
 
         
@@ -188,46 +178,79 @@ class Source():
         self.angle= angle
         self.frequency= frequency
         self.Reff=value
+        self.Vlast=0.0
     def Sourceupdate(self,TheTime):
-        V_mag = self.magnitude
-        V_ang = self.angle
+        I_mag = self.magnitude
+        I_ang = self.angle
         freq = self.frequency
-        V_instantaneous = V_mag*np.sin(2.0*np.pi*50.0*TheTime + V_ang*np.pi/180.0)
-        return V_instantaneous
+        I_instantaneous = I_mag*np.sin(2.0*np.pi*self.frequency*TheTime + I_ang*np.pi/180.0)
+        return I_instantaneous
 
- 
+TheTime=config.srtTime
 
-
-
-#Initialize G with 4X4
-print("Create EMT object")
 EMTDC=EMT()
-# Add componets and form G matrix
-print("Form G")
+
 EMTDC.formG()
 
-# go to net timestep
-TheTime=-0.0123
-#Update Sources
+TheTime=TheTime+config.Dt
+
 EMTDC.updateVol()
 
-print("Calc Branch current history")
 EMTDC.calcBrnHistory()
-
-
-print("Calc current injection")
 
 EMTDC.calcinjection()
 
 EMTDC.calcnewV()
 
+EMTDC.calcNewbranchI()
+
+
+TheTime=TheTime+config.Dt
+
+
+EMTDC.updateVol()
+
+EMTDC.calcBrnHistory()
+
+EMTDC.calcinjection()
+
+EMTDC.calcnewV()
+
+EMTDC.calcNewbranchI()
+
+
+
+TheTime=TheTime+config.Dt
+
+
+EMTDC.updateVol()
+
+EMTDC.calcBrnHistory()
+
+EMTDC.calcinjection()
+
+EMTDC.calcnewV()
+
+EMTDC.calcNewbranchI()
 
 
 
 
-# Update sources
 
-# Calculate history
+
+TheTime=TheTime+config.Dt
+
+
+EMTDC.updateVol()
+
+EMTDC.calcBrnHistory()
+
+EMTDC.calcinjection()
+
+EMTDC.calcnewV()
+
+EMTDC.calcNewbranchI()
+
 
 
 
