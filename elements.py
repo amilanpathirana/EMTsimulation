@@ -8,6 +8,8 @@ class Branch():
         self.stpnode=stpnode
         self.Ilast=Ilast
         self.Vlast=Vlast
+        self.Isource=0
+
         
 
         if self.brnType=="R":
@@ -30,6 +32,7 @@ class Source():
         self.angle= angle
         self.frequency= frequency
         self.Reff=value
+        self.Isource=0
         self.Vlast=0.0
     def Sourceupdate(self,TheTime):
         I_mag = self.magnitude

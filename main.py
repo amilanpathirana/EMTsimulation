@@ -6,10 +6,14 @@ import dataloader as dl
 class EMT:
     def __init__(self):
         self.comp_list = dl.elemet_list
-        
+
+        src_count=0
         for obj in self.comp_list:
             if obj.brnType=="S":
                 self.S1=obj
+                src_count=src_count+1
+        self.src_cont=src_count
+
 
 
         #max node number
@@ -22,6 +26,8 @@ class EMT:
             if To > maxnode:
                 maxnode=To
         self.numNodes=maxnode
+        self.unknownNodes=self.numNodes-self.src_cont
+
         self.numBranches=len(self.comp_list)
         
         self.vol=[]
@@ -36,18 +42,20 @@ class EMT:
         for i in range(self.numNodes):
             self.I_History_src.append(0)
 
+       
+
     def formG(self):
+        print("\nGenerating the conductance matrix")
         self.G = np.zeros((self.numNodes,self.numNodes))
         for obj in self.comp_list:
-            Type = obj.brnType
             From = obj.strnode
             To = obj.stpnode
-
+            
             if To==0 and From==0:
-                print("*** Both Nodes Zero ***")
+                print("*** Both nodes of a element is zero ***")
             
             if To==From:
-                print("*** Both Nodes Same ***")
+                print("*** Both nodes of a element is same ***")
 
             Series = 1
             if To == 0:
@@ -58,12 +66,12 @@ class EMT:
                 From = To
                 Series = 0
               
-
              
             obj.Series=Series
 
             To=To-1
             From=From-1
+
             if obj.Series==1:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
                 self.G[From,From] = self.G[From,From] + 1/obj.Reff
@@ -72,7 +80,7 @@ class EMT:
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
-        print(self.G)
+        print("Conductance matrix:\n ",self.G)
  
     def calcBrnHistory(self):
         for obj in self.comp_list:
@@ -96,6 +104,10 @@ class EMT:
             To = obj.stpnode-1
 
             Brn_I_History = obj.ihistory
+
+            for i in range(len(self.I_History)):
+                self.I_History[i]=0.0
+
             if obj.Series==1:
             #Series Component
                 self.I_History[To] = self.I_History[To] + Brn_I_History
@@ -106,14 +118,14 @@ class EMT:
                 elif From== 0:
                     self.I_History[From] = self.I_History[From]- Brn_I_History
                 else:
-                    print("*** ***")
+                    pass
 
-        print(self.I_History)
+        #print(self.I_History)
 
     def calcnewV(self):
         invG=np.linalg.inv(self.G)
         self.vol=np.matmul(invG,self.I_History)
-        print("vol",self.vol)
+        #print("vol",self.vol)
 
     def updateVol(self,TheTime):
         for obj in self.comp_list:
@@ -151,15 +163,14 @@ class EMT:
 
 
 def run():
-    print("run")
+    print("Start running the simulation.....")
     Time=config.srtTime
     EMTDC=EMT()
-
     EMTDC.formG()
 
     while Time<config.stpTime:
-        
-        print(Time,config.stpTime)
+    
+        #print(Time,config.stpTime)
         Time=Time+config.Dt
 
         EMTDC.updateVol(Time)
