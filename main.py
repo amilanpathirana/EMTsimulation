@@ -114,12 +114,13 @@ class EMT:
         self.vol=np.matmul(invG,self.I_History)
         print("vol",self.vol)
 
-    def updateVol(self):
+    def updateVol(self,TheTime):
         for obj in self.comp_list:
             Type = obj.brnType
             From = obj.strnode-1
             To = obj.stpnode-1
-            self.I_History_src[2] = self.S1.Sourceupdate(TheTime)
+            self.TheTime=TheTime
+            self.I_History_src[2] = self.S1.Sourceupdate(self.TheTime)
        
         self.I_History=np.add(self.I_History,self.I_History_src)
 
@@ -186,77 +187,33 @@ class Source():
         I_instantaneous = I_mag*np.sin(2.0*np.pi*self.frequency*TheTime + I_ang*np.pi/180.0)
         return I_instantaneous
 
-TheTime=config.srtTime
-
-EMTDC=EMT()
-
-EMTDC.formG()
-
-TheTime=TheTime+config.Dt
-
-EMTDC.updateVol()
-
-EMTDC.calcBrnHistory()
-
-EMTDC.calcinjection()
-
-EMTDC.calcnewV()
-
-EMTDC.calcNewbranchI()
-
-
-TheTime=TheTime+config.Dt
-
-
-EMTDC.updateVol()
-
-EMTDC.calcBrnHistory()
-
-EMTDC.calcinjection()
-
-EMTDC.calcnewV()
-
-EMTDC.calcNewbranchI()
-
-
-
-TheTime=TheTime+config.Dt
-
-
-EMTDC.updateVol()
-
-EMTDC.calcBrnHistory()
-
-EMTDC.calcinjection()
-
-EMTDC.calcnewV()
-
-EMTDC.calcNewbranchI()
 
 
 
 
 
 
-TheTime=TheTime+config.Dt
+def run():
+    print("run")
+    Time=config.srtTime
+    EMTDC=EMT()
+
+    EMTDC.formG()
+
+    while Time<config.stpTime:
+        
+        print(Time,config.stpTime)
+        Time=Time+config.Dt
+
+        EMTDC.updateVol(Time)
+
+        EMTDC.calcBrnHistory()
+
+        EMTDC.calcinjection()
+
+        EMTDC.calcnewV()
+
+        EMTDC.calcNewbranchI()
 
 
-EMTDC.updateVol()
-
-EMTDC.calcBrnHistory()
-
-EMTDC.calcinjection()
-
-EMTDC.calcnewV()
-
-EMTDC.calcNewbranchI()
-
-
-
-
-
-
-
-
-
-
+run()
