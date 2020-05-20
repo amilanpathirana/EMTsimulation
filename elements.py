@@ -72,7 +72,11 @@ class Switch():
                 self.status=1
                 self.stoptogle=1
 
-            print("Togled",self.status)
+        print("Togled",self.status)
+        if self.status==1:
+            self.Reff=self.valueon
+        elif self.status==0:
+            self.Reff=self.valueoff
 
                     
 

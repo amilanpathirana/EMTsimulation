@@ -38,7 +38,7 @@ class EMT:
         self.trace=[]
 
     def formG(self):
-        print("\nGenerating the conductance matrix...")
+        #print("\nGenerating the conductance matrix...")
         self.G = np.zeros((self.numNodes,self.numNodes))
         for obj in self.comp_list:
             From = obj.strnode
@@ -73,7 +73,7 @@ class EMT:
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
-        print("Conductance matrix:\n ",self.G)
+        #print("Conductance matrix:\n ",self.G)
  
     def calcBrnHistory(self,TheTime):
         for obj in self.comp_list:
@@ -179,8 +179,10 @@ def run():
 
     while Time<config.stpTime:
         
-        if Time>(config.stpTime-5*config.Dt):
-            el.Switch.togle
+        if Time==5*config.Dt:
+            el.Switch.togle()
+            print("Togle")
+
         EMTDC.formG()
         #print(Time)
         EMTDC.calcBrnHistory(Time)
