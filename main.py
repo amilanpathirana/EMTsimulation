@@ -116,6 +116,8 @@ class EMT:
         #print(self.I_History)
 
     def calcnewV(self):
+
+
         invG=np.linalg.inv(self.G)
         self.vol=np.matmul(invG,self.I_History)
         print("vol",self.vol)
@@ -173,9 +175,13 @@ def run():
     print("Start running the simulation.....")
     Time=config.srtTime
     EMTDC=EMT()
-    EMTDC.formG()
+
 
     while Time<config.stpTime:
+        
+        if Time>(config.stpTime-5*config.Dt):
+            el.Switch.togle
+        EMTDC.formG()
         #print(Time)
         EMTDC.calcBrnHistory(Time)
 
