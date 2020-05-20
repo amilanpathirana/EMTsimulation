@@ -35,6 +35,8 @@ class Source():
         self.Isource=0
         self.Vlast=0.0
         self.ihistory=0.0
+
+        
     def Sourceupdate(self,TheTime):
         I_mag = self.magnitude
         I_ang = self.angle
