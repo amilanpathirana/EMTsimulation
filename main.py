@@ -125,6 +125,7 @@ class EMT:
         self.trace.append(self.vol[node-1])
 
     def plotv(self):
+        plt.close('all')
         plt.plot(self.trace)
         plt.show()
 
@@ -185,7 +186,7 @@ def run():
         EMTDC.calcNewbranchI()
 
         EMTDC.recordv(3)
-        #print(EMTDC.vol)
+        
 
         Time=Time+config.Dt
 

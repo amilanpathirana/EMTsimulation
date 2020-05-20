@@ -1,4 +1,4 @@
-Dt=50e-6
+Dt=5e-6
 srtTime=0.0
-stpTime=srtTime+300*Dt
+stpTime=srtTime+30*Dt
 
