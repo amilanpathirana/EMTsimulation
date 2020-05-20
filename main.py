@@ -10,11 +10,8 @@ class EMT:
         src_count=0
         for obj in self.comp_list:
             if obj.brnType=="S":
-                self.S1=obj
                 src_count=src_count+1
         self.src_cont=src_count
-
-
 
         #max node number
         maxnode=0
@@ -45,7 +42,7 @@ class EMT:
        
 
     def formG(self):
-        print("\nGenerating the conductance matrix")
+        print("\nGenerating the conductance matrix...")
         self.G = np.zeros((self.numNodes,self.numNodes))
         for obj in self.comp_list:
             From = obj.strnode
@@ -82,12 +79,12 @@ class EMT:
             
         print("Conductance matrix:\n ",self.G)
  
-    def calcBrnHistory(self):
+    def calcBrnHistory(self,TheTime):
         for obj in self.comp_list:
             if obj.brnType=="R":
                obj.ihistory=0
             elif obj.brnType=="S":
-                obj.ihistory= 0
+                obj.Sourceupdate(TheTime)
             elif obj.brnType=="L":
                 obj.ihistory=obj.Ilast+obj.Vlast/obj.Reff
             elif obj.brnType=="C":
@@ -127,15 +124,15 @@ class EMT:
         self.vol=np.matmul(invG,self.I_History)
         #print("vol",self.vol)
 
-    def updateVol(self,TheTime):
+    """def updateVol(self,TheTime):
         for obj in self.comp_list:
             Type = obj.brnType
             From = obj.strnode-1
             To = obj.stpnode-1
-            self.TheTime=TheTime
-            self.I_History_src[2] = self.S1.Sourceupdate(self.TheTime)
+            #self.TheTime=TheTime
+            #self.I_History_src[2] = self.S1.Sourceupdate(self.TheTime)
        
-        self.I_History=np.add(self.I_History,self.I_History_src)
+        self.I_History=np.add(self.I_History,self.I_History_src)"""
 
     def calcNewbranchI(self):
         for obj in self.comp_list:
@@ -143,7 +140,8 @@ class EMT:
             From = obj.strnode-1
             To = obj.stpnode-1
 
-            V = obj.Vlast
+            V = self.vol[From]-self.vol[To]
+            obj.Vlast=V
 
             if obj.brnType == "R":
                 obj.I_last = V/obj.Reff
@@ -153,6 +151,9 @@ class EMT:
                 obj.I_last = V/obj.Reff + obj.ihistory
             elif obj.brnType == "C":
                 obj.I_last = V/obj.Reff + obj.ihistory
+
+
+            
 
         
 
@@ -169,19 +170,18 @@ def run():
     EMTDC.formG()
 
     while Time<config.stpTime:
-    
-        #print(Time,config.stpTime)
-        Time=Time+config.Dt
 
-        EMTDC.updateVol(Time)
-
-        EMTDC.calcBrnHistory()
+        EMTDC.calcBrnHistory(Time)
 
         EMTDC.calcinjection()
 
         EMTDC.calcnewV()
 
         EMTDC.calcNewbranchI()
+
+        print(EMTDC.vol)
+
+        Time=Time+config.Dt
 
 
 run()

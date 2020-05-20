@@ -34,12 +34,13 @@ class Source():
         self.Reff=value
         self.Isource=0
         self.Vlast=0.0
+        self.ihistory=0.0
     def Sourceupdate(self,TheTime):
         I_mag = self.magnitude
         I_ang = self.angle
         freq = self.frequency
-        I_instantaneous = I_mag*np.sin(2.0*np.pi*self.frequency*TheTime + I_ang*np.pi/180.0)
-        return I_instantaneous
+        self.ihistory = I_mag*np.sin(2.0*np.pi*self.frequency*TheTime + I_ang*np.pi/180.0)
+        
 
 
 
