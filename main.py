@@ -2,6 +2,7 @@ import numpy as np
 import config
 import elements as el
 import dataloader as dl
+import matplotlib.pyplot as plt
 
 class EMT:
     def __init__(self):
@@ -34,6 +35,7 @@ class EMT:
         self.I_History=[]
         for i in range(self.numNodes):
             self.I_History.append(0)
+        self.trace=[]
 
     def formG(self):
         print("\nGenerating the conductance matrix...")
@@ -98,8 +100,7 @@ class EMT:
             To = obj.stpnode-1
 
             Brn_I_History = obj.ihistory
-            print(Brn_I_History)
-            
+            #print(Brn_I_History)
             if obj.Series==1:
             #Series Component
                 self.I_History[To] = self.I_History[To] + Brn_I_History
@@ -117,7 +118,19 @@ class EMT:
     def calcnewV(self):
         invG=np.linalg.inv(self.G)
         self.vol=np.matmul(invG,self.I_History)
-        #print("vol",self.I_History)
+        print("vol",self.vol)
+
+
+    def recordv(self,node):
+        self.trace.append(self.vol[node-1])
+
+    def plotv(self):
+        plt.plot(self.trace)
+        plt.show()
+
+
+
+
 
 
 
@@ -126,14 +139,18 @@ class EMT:
             Type = obj.brnType
             From = obj.strnode-1
             To = obj.stpnode-1
-
-            V = self.vol[From]-self.vol[To]
+            if From==-1:
+                V = self.vol[To]
+            if To==-1:
+                V = -self.vol[To]
+            else:
+                V=self.vol[From]-self.vol[To]
             obj.Vlast=V
-            
+            #print("To",To)
             if obj.brnType == "R":
                 obj.I_last = V/obj.Reff
             elif obj.brnType == "S":
-                obj.I_last = 0
+                obj.I_last = V/obj.Reff
             elif obj.brnType == "L":
                 obj.I_last = V/obj.Reff + obj.ihistory
             elif obj.brnType == "C":
@@ -167,9 +184,12 @@ def run():
 
         EMTDC.calcNewbranchI()
 
+        EMTDC.recordv(3)
         #print(EMTDC.vol)
 
         Time=Time+config.Dt
 
+    EMTDC.plotv()
+    #print(EMTDC.trace)
 
 run()
