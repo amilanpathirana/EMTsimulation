@@ -18,22 +18,17 @@ def run():
             print("Togle")
 
         EMTDC.formG()
-        #print(Time)
+        EMTDC.Gremake()
         EMTDC.calcBrnHistory(Time)
-
         EMTDC.calcinjection()
-
         EMTDC.calcnewV()
-
         EMTDC.calcNewbranchI()
-
         EMTDC.recordv(2)
         
-
         Time=Time+config.Dt
 
     EMTDC.plotv()
-    #print(EMTDC.trace)
+
 
 
 

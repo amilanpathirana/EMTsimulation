@@ -75,7 +75,46 @@ class EMT:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
         #print("Conductance matrix:\n ",self.G)
+
+
+    def Gremake(self):
+        print("No of sources",self.src_cont)
+        self.unknownNodes=self.numNodes-self.src_cont
+        print("No of unknown nodes",self.unknownNodes)
+
+        
+        G_UU = self.G[0:self.unknownNodes,0:self.unknownNodes]
+        print("GUU",G_UU)
+        print(self.G)
+
+        G_UK = self.G[0:self.unknownNodes-1,self.unknownNodes:self.numNodes]
+        print("GUK",G_UK)
+
+        print(self.I_History)
+        I_U = self.I_History[0:self.unknownNodes]
+        print("IU",I_U)
+
+        V_K=self.vol[0:self.src_cont] 
  
+        print("VK",V_K)
+
+        I_d_history = I_U - G_UK*V_K
+
+        print("idhis",I_d_history)
+
+        invG=np.linalg.inv(G_UU)
+        V_U=np.matmul(invG,I_d_history)
+        
+
+        
+
+        print("VU",V_U)
+
+        #V_n(1:No_UnkownNodes,1) = V_U
+        
+        #V_n(No_UnkownNodes+1:No_Nodes,1)=V_K
+
+
     def calcBrnHistory(self,TheTime):
         for obj in self.comp_list:
             if obj.brnType=="R":
