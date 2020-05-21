@@ -27,13 +27,16 @@ def run():
 
         EMTDC.calcNewbranchI()
 
-        EMTDC.recordv(3)
+        EMTDC.recordv(2)
         
 
         Time=Time+config.Dt
 
     EMTDC.plotv()
     #print(EMTDC.trace)
+
+
+
 
 if __name__ == "__main__":
     run()

@@ -10,6 +10,7 @@ class EMT:
 
         src_count=0
         for obj in self.comp_list:
+            #print(obj.brnType)
             if obj.brnType=="S":
                 src_count=src_count+1
         self.src_cont=src_count
