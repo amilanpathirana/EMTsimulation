@@ -97,18 +97,18 @@ class EMT:
         V_K=self.vol[0:self.src_cont] 
  
         print("VK",V_K)
-
+        I_d_history=self.I_History[0:self.unknownNodes]
         I_d_history = I_U - G_UK*V_K
 
         print("idhis",I_d_history)
 
         invG=np.linalg.inv(G_UU)
-        V_U=np.matmul(invG,I_d_history)
+        #V_U=np.matmul(invG,I_d_history)
         
 
         
 
-        print("VU",V_U)
+        #print("VU",V_U)
 
         #V_n(1:No_UnkownNodes,1) = V_U
         
