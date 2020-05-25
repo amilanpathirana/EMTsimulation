@@ -1,27 +1,21 @@
 import numpy as np
 import config
-
-class Branch():
+class RLC():
     def __init__(self,brnType,strnode,stpnode,Ilast,Vlast,value):
         self.brnType=brnType
         self.strnode=strnode
         self.stpnode=stpnode
         self.Ilast=Ilast
-        self.Vlast=Vlast
-        self.Isource=0
-
-        
+        self.Vlast=Vlast           
 
         if self.brnType=="R":
-            self.Reff=value
-        elif self.brnType=="S":
             self.Reff=value
         elif self.brnType=="L":
             self.Reff=2*value/config.Dt
         elif self.brnType=="C":
             self.Reff=config.Dt/2*value
         else:
-            print("Only R L C S elements considered")
+            print("Only R L C elements considered")
 
 class Source():
     def __init__(self,brnType,strnode,stpnode,magnitude,angle,frequency,value):
@@ -49,7 +43,6 @@ class Switch():
         self.stpnode=stpnode
         self.Ilast=Ilast
         self.Vlast=Vlast
-        self.Isource=0
         self.valueon=valueon
         self.valueoff=valueoff
         self.status=status
