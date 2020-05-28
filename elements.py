@@ -13,9 +13,6 @@ class RLC():
         if self.brnType=="R":
             self.Reff=value
             self.ihistory=0.0
-        elif self.brnType=="S":
-            self.Reff=value
-            self.ihistory=0.0
         elif self.brnType=="L":
             self.Reff=2*value/config.Dt
             self.ihistory=self.Ilast+self.Vlast/self.Reff
@@ -23,7 +20,7 @@ class RLC():
             self.Reff=config.Dt/2*value
             self.ihistory=-self.Ilast-self.Vlast/self.Reff
         else:
-            print("Only R L C only")
+            print("R L C only")
 
 class Source():
     def __init__(self,brnType,strnode,stpnode,magnitude,angle,frequency,value):
