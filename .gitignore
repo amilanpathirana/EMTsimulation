@@ -1,5 +1,6 @@
 /.vscode/
-/__pycache__/ 
+/__pycache__/*
 
 *.csv
+
 /Power System Electromagnatic Transients Simulation_IET.pdf

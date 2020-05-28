@@ -24,9 +24,9 @@ class EMT:
                 maxnode=From
             if To > maxnode:
                 maxnode=To
+        
         self.numNodes=maxnode
         self.unknownNodes=self.numNodes-self.src_cont
-
         self.numBranches=len(self.comp_list)
         
         self.vol=[]
@@ -36,10 +36,11 @@ class EMT:
         self.I_History=[]
         for i in range(self.numNodes):
             self.I_History.append(0)
+
         self.trace=[]
 
     def formG(self):
-        #print("\nGenerating the conductance matrix...")
+        print("\nGenerating the conductance matrix...")
         self.G = np.zeros((self.numNodes,self.numNodes))
         for obj in self.comp_list:
             From = obj.strnode
@@ -74,7 +75,7 @@ class EMT:
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
-        #print("Conductance matrix:\n ",self.G)
+        print("Conductance matrix:\n ",self.G)
 
 
     def Gremake(self):

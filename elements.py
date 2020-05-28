@@ -37,6 +37,7 @@ class Source():
 
 
 class Switch():
+    stoptogle=0
     def __init__(self,brnType,strnode,stpnode,Ilast,Vlast,valueon,valueoff,togletime,status=1):
         self.brnType=brnType
         self.strnode=strnode
@@ -47,7 +48,7 @@ class Switch():
         self.valueoff=valueoff
         self.status=status
         self.ihistory=0.0
-        self.stoptogle=0
+        
 
         if self.status==1:
             self.Reff=self.valueon
@@ -56,14 +57,14 @@ class Switch():
 
     def togle(self):
         print(self.status)
-        if self.stoptogle==0:
+        if stoptogle==0:
             if self.status==1:
                 self.status=0
-                self.stoptogle=1
+                stoptogle=1
 
             elif self.status==0:
                 self.status=1
-                self.stoptogle=1
+                stoptogle=1
 
         print("Togled",self.status)
         if self.status==1:
