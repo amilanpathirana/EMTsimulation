@@ -8,7 +8,7 @@ import elements as el
 def run():
     print("Start running the simulation.....")
     Time=config.srtTime
-    EMTDC=emtcls.EMT()
+    EMTDC=emtcls.Network()
 
 
     while Time<config.stpTime:

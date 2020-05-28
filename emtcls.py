@@ -4,7 +4,7 @@ import elements as el
 import dataloader as dl
 import matplotlib.pyplot as plt
 
-class EMT:
+class Network:
     def __init__(self):
         self.comp_list = dl.elemet_list
 
@@ -29,13 +29,13 @@ class EMT:
         self.unknownNodes=self.numNodes-self.src_cont
         self.numBranches=len(self.comp_list)
         
-        self.vol=[]
+        self.Vn=[]
         for i in range(self.numNodes):
-            self.vol.append(0)
+            self.Vn.append(0)
 
-        self.I_History=[]
+        self.I_H=[]
         for i in range(self.numNodes):
-            self.I_History.append(0)
+            self.I_H.append(0)
 
         self.trace=[]
 
@@ -91,14 +91,14 @@ class EMT:
         G_UK = self.G[0:self.unknownNodes-1,self.unknownNodes:self.numNodes]
         print("GUK",G_UK)
 
-        print(self.I_History)
-        I_U = self.I_History[0:self.unknownNodes]
+        print(self.I_H)
+        I_U = self.I_H[0:self.unknownNodes]
         print("IU",I_U)
 
-        V_K=self.vol[0:self.src_cont] 
+        V_K=self.Vn[0:self.src_cont] 
  
         print("VK",V_K)
-        I_d_history=self.I_History[0:self.unknownNodes]
+        I_d_history=self.I_H[0:self.unknownNodes]
         I_d_history = I_U - G_UK*V_K
 
         print("idhis",I_d_history)
@@ -132,40 +132,40 @@ class EMT:
             #print(obj.ihistory)
 
     def calcinjection(self):
-        for i in range(len(self.I_History)):
-            self.I_History[i]=0.0
+        for i in range(len(self.I_H)):
+            self.I_H[i]=0.0
 
         for obj in self.comp_list:
             Type = obj.brnType
             From = obj.strnode-1
             To = obj.stpnode-1
 
-            Brn_I_History = obj.ihistory
-            #print(Brn_I_History)
+            Brn_I_H = obj.ihistory
+            #print(Brn_I_H)
             if obj.Series==1:
-            #Series Component
-                self.I_History[To] = self.I_History[To] + Brn_I_History
-                self.I_History[From] = self.I_History[From]- Brn_I_History
+            #Series Componentrt
+                self.I_H[To] = self.I_H[To] + Brn_I_H
+                self.I_H[From] = self.I_H[From]- Brn_I_H
             else:
                 if To== 0:
-                    self.I_History[To] = self.I_History[To] + Brn_I_History
+                    self.I_H[To] = self.I_H[To] + Brn_I_H
                 elif From== 0:
-                    self.I_History[From] = self.I_History[From]- Brn_I_History
+                    self.I_H[From] = self.I_H[From]- Brn_I_H
                 else:
                     pass
 
-        #print(self.I_History)
+        #print(self.I_H)
 
     def calcnewV(self):
 
 
         invG=np.linalg.inv(self.G)
-        self.vol=np.matmul(invG,self.I_History)
-        print("vol",self.vol)
+        self.Vn=np.matmul(invG,self.I_H)
+        print("Vn",self.Vn)
 
 
     def recordv(self,node):
-        self.trace.append(self.vol[node-1])
+        self.trace.append(self.Vn[node-1])
 
     def plotv(self):
         plt.close('all')
@@ -184,11 +184,11 @@ class EMT:
             From = obj.strnode-1
             To = obj.stpnode-1
             if From==-1:
-                V = self.vol[To]
+                V = self.Vn[To]
             if To==-1:
-                V = -self.vol[To]
+                V = -self.Vn[To]
             else:
-                V=self.vol[From]-self.vol[To]
+                V=self.Vn[From]-self.Vn[To]
             obj.Vlast=V
             #print("To",To)
             if obj.brnType == "R":
