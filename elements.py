@@ -6,16 +6,24 @@ class RLC():
         self.strnode=strnode
         self.stpnode=stpnode
         self.Ilast=Ilast
-        self.Vlast=Vlast           
+        self.Vlast=Vlast
+        self.ihistory=0.0
+        
 
         if self.brnType=="R":
             self.Reff=value
+            self.ihistory=0.0
+        elif self.brnType=="S":
+            self.Reff=value
+            self.ihistory=0.0
         elif self.brnType=="L":
             self.Reff=2*value/config.Dt
+            self.ihistory=self.Ilast+self.Vlast/self.Reff
         elif self.brnType=="C":
             self.Reff=config.Dt/2*value
+            self.ihistory=-self.Ilast-self.Vlast/self.Reff
         else:
-            print("Only R L C elements considered")
+            print("Only R L C only")
 
 class Source():
     def __init__(self,brnType,strnode,stpnode,magnitude,angle,frequency,value):
@@ -26,9 +34,11 @@ class Source():
         self.angle= angle
         self.frequency= frequency
         self.Reff=value
-        self.Isource=0
         self.Vlast=0.0
         self.ihistory=0.0
+
+
+
 
 
     def Sourceupdate(self,TheTime):
