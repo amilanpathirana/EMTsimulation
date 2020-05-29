@@ -107,8 +107,6 @@ class Network:
         #V_U=np.matmul(invG,I_d_history)
         
 
-        
-
         #print("VU",V_U)
 
         #V_n(1:No_UnkownNodes,1) = V_U
