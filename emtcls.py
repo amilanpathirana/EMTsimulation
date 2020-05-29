@@ -28,6 +28,8 @@ class Network:
         self.numNodes=maxnode
         self.unknownNodes=self.numNodes-self.src_cont
         self.numBranches=len(self.comp_list)
+
+        self.G = np.zeros((self.numNodes,self.numNodes))
         
         self.Vn=[]
         for i in range(self.numNodes):
@@ -41,7 +43,7 @@ class Network:
 
     def formG(self):
         print("\nGenerating the conductance matrix...")
-        self.G = np.zeros((self.numNodes,self.numNodes))
+        
         for obj in self.comp_list:
             From = obj.strnode
             To = obj.stpnode
@@ -78,6 +80,7 @@ class Network:
         print("Conductance matrix:\n ",self.G)
 
 
+
     def Gremake(self):
         print("No of sources",self.src_cont)
         self.unknownNodes=self.numNodes-self.src_cont
@@ -86,9 +89,9 @@ class Network:
         
         G_UU = self.G[0:self.unknownNodes,0:self.unknownNodes]
         print("GUU",G_UU)
-        print(self.G)
+        
 
-        G_UK = self.G[0:self.unknownNodes-1,self.unknownNodes:self.numNodes]
+        G_UK = self.G[0:self.unknownNodes,self.unknownNodes:self.numNodes]
         print("GUK",G_UK)
 
         print(self.I_H)
