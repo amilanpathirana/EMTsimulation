@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 class Network:
     def __init__(self):
+
         self.comp_list = dl.elemet_list
 
         src_count=0
@@ -15,7 +16,6 @@ class Network:
                 src_count=src_count+1
         self.src_cont=src_count
 
-        #max node number
         maxnode=0
         for obj in self.comp_list:
             From = obj.strnode
@@ -31,18 +31,17 @@ class Network:
 
         self.G = np.zeros((self.numNodes,self.numNodes))
         
-        self.Vn=[]
-        for i in range(self.numNodes):
-            self.Vn.append(0)
-
-        self.I_H=[]
-        for i in range(self.numNodes):
-            self.I_H.append(0)
+        self.Vn=np.zeros((self.numNodes, 1))
+        self.I_H=np.zeros((self.numNodes, 1))
 
         self.trace=[]
 
+        print("No of sources",self.src_cont,"\n")
+        print("No of unknown nodes",self.unknownNodes,"\n")
+
+
     def formG(self):
-        print("\nGenerating the conductance matrix...")
+        print("Generating the conductance matrix...")
         
         for obj in self.comp_list:
             From = obj.strnode
@@ -77,34 +76,34 @@ class Network:
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
-        print("Conductance matrix:\n ",self.G)
-
-
+        print("Conductance matrix:\n ",self.G,"\n")
+       
 
     def Gremake(self):
-        print("No of sources",self.src_cont)
-        self.unknownNodes=self.numNodes-self.src_cont
-        print("No of unknown nodes",self.unknownNodes)
+                  
 
         
         G_UU = self.G[0:self.unknownNodes,0:self.unknownNodes]
         print("GUU",G_UU)
+        print("\n")
         
 
         G_UK = self.G[0:self.unknownNodes,self.unknownNodes:self.numNodes]
         print("GUK",G_UK)
+        print("\n")
 
-        print(self.I_H)
         I_U = self.I_H[0:self.unknownNodes]
         print("IU",I_U)
+        print("\n")
 
         V_K=self.Vn[0:self.src_cont] 
- 
         print("VK",V_K)
+        print("\n")
+
         I_d_history=self.I_H[0:self.unknownNodes]
         I_d_history = I_U - G_UK*V_K
-
         print("idhis",I_d_history)
+        print("\n ///////////////////////////////////////// \n")
 
         invG=np.linalg.inv(G_UU)
         #V_U=np.matmul(invG,I_d_history)

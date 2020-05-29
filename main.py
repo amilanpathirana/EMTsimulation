@@ -6,24 +6,19 @@ import elements as el
 
 
 def run():
-    print("Start running the simulation.....")
+    print("Start running the simulation..... \n")
     Time=config.srtTime
     EMTDC=emtcls.Network()
-
+    EMTDC.formG()
+    EMTDC.Gremake()
 
     while Time<config.stpTime:
         
-        if Time==5*config.Dt:
-            el.Switch.togle
-            print("Togle")
-
-        EMTDC.formG()
-        EMTDC.Gremake()
         EMTDC.calcBrnHistory(Time)
         EMTDC.calcinjection()
         EMTDC.calcnewV()
         EMTDC.calcNewbranchI()
-        EMTDC.recordv(2)
+        EMTDC.recordv(3)
         
         Time=Time+config.Dt
 
