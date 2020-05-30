@@ -1,3 +1,2 @@
-# EMTsimulation
-EMT simulation program
-How to simulate circuits using Domels algorithm
+# DommelSim
+Free EMT simulation program based on Domels algorithm
