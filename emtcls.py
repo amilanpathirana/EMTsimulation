@@ -3,6 +3,7 @@ import config
 import elements as el
 import dataloader as dl
 import matplotlib.pyplot as plt
+import scipy.linalg as la
 
 class Network:
     def __init__(self):
@@ -77,51 +78,69 @@ class Network:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
             
         print("Conductance matrix:\n ",self.G,"\n")
+        print("IH",self.I_H,"\n")
+        print("Vn",self.Vn,"\n")
        
 
-    def Gremake(self):
-                  
+    def Gdivide(self):
+        print("Modifying the conductance matrix...\n")        
+
+        self.G_UU = self.G[0:self.unknownNodes,0:self.unknownNodes]
+        print("G_UU",self.G_UU)
+        print("\n")
+
+        self.G_UK = self.G[0:self.unknownNodes,self.unknownNodes:self.numNodes]
+        print("G_UK",self.G_UK)
+        print("\n")
+
+        self.G_KU = self.G[self.unknownNodes:self.numNodes,0:self.unknownNodes]
+        print("G_KU",self.G_KU)
+        print("\n")
+
+        self.G_KK = self.G[self.unknownNodes:self.numNodes,self.unknownNodes:self.numNodes]
+        print("G_KK",self.G_KK)
+        print("\n")
+
+
+    def LU(self):
+        (P, L, U) = la.lu(self.G_UU)
+        self.G_UU=U
+        print("G_UU after LU decom",self.G_UU)
+        print("\n")
+
+    def IVdevide(self):
+        self.V_K=self.Vn[0:self.src_cont] 
+        print("V_K",self.V_K)
+        print("\n")
+
+        self.V_U=self.Vn[0:self.unknownNodes]
+        print("V_U",self.V_U)
+        print("\n")
+
+        self.I_K=self.I_H[0:self.src_cont]
+        self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K)-self.I_H[self.unknownNodes:self.numNodes] 
+        print("I_K",self.I_K)
+        print("\n")
 
         
-        G_UU = self.G[0:self.unknownNodes,0:self.unknownNodes]
-        print("GUU",G_UU)
-        print("\n")
-        
+        self.I_U = self.I_H[0:self.unknownNodes]
+        self.I_U = self.I_U - np.matmul(self.G_UK,self.V_K)
+        print("I_U",self.I_U)
 
-        G_UK = self.G[0:self.unknownNodes,self.unknownNodes:self.numNodes]
-        print("GUK",G_UK)
-        print("\n")
-
-        I_U = self.I_H[0:self.unknownNodes]
-        print("IU",I_U)
-        print("\n")
-
-        V_K=self.Vn[0:self.src_cont] 
-        print("VK",V_K)
-        print("\n")
-
-        I_d_history=self.I_H[0:self.unknownNodes]
-        I_d_history = I_U - G_UK*V_K
-        print("idhis",I_d_history)
         print("\n ///////////////////////////////////////// \n")
 
-        invG=np.linalg.inv(G_UU)
-        #V_U=np.matmul(invG,I_d_history)
-        
 
-        #print("VU",V_U)
 
-        #V_n(1:No_UnkownNodes,1) = V_U
-        
-        #V_n(No_UnkownNodes+1:No_Nodes,1)=V_K
+
 
 
     def calcBrnHistory(self,TheTime):
         for obj in self.comp_list:
             if obj.brnType=="R":
-               obj.ihistory=0
+               obj.ihistory=0.0
             elif obj.brnType=="S":
                 obj.Sourceupdate(TheTime)
+                #print("source hisory",obj.ihistory)
             elif obj.brnType=="L":
                 obj.ihistory=obj.Ilast+obj.Vlast/obj.Reff
             elif obj.brnType=="C":
@@ -129,11 +148,11 @@ class Network:
             else:
                 print("Only R L C S elements considered")
             
-            #print(obj.ihistory)
+            print("history of branch",obj.ihistory,"\n")
 
     def calcinjection(self):
-        for i in range(len(self.I_H)):
-            self.I_H[i]=0.0
+
+        self.I_H=np.zeros((self.numNodes, 1))
 
         for obj in self.comp_list:
             Type = obj.brnType
@@ -154,14 +173,25 @@ class Network:
                 else:
                     pass
 
-        #print(self.I_H)
+        print("I_H",self.I_H)
 
     def calcnewV(self):
+        self.V_U=np.linalg.solve(self.G_UU, self.I_U ) 
+        print("Vn",self.V_U)
 
 
-        invG=np.linalg.inv(self.G)
-        self.Vn=np.matmul(invG,self.I_H)
+    def reconstruct_V(self):
+        self.Vn=np.concatenate([self.V_U,self.V_K])
         print("Vn",self.Vn)
+
+    def reconstruct_I(self):
+        print("IU",self.I_U)
+        print("IK",self.I_K)
+        self.I_K=self.G_KU*self.V_U+self.G_KK*self.V_K-self.I_H[self.unknownNodes:self.numNodes] 
+        self.I_H=np.concatenate([self.I_U,self.I_K])
+        print("I_H",self.I_H)
+        print("delthis",self.I_H[self.unknownNodes:self.numNodes] )
+
 
 
     def recordv(self,node):
