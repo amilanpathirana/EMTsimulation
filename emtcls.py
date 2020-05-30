@@ -108,36 +108,31 @@ class Network:
         print("G_UU after LU decom",self.G_UU)
         print("\n")
 
-    def IVdevide(self):
+    def Vdivide(self):
         self.V_K=self.Vn[0:self.src_cont] 
         print("V_K",self.V_K)
         print("\n")
 
         self.V_U=self.Vn[0:self.unknownNodes]
         print("V_U",self.V_U)
-        print("\n")
-
-        self.I_K=self.I_H[0:self.src_cont]
-        print("I_K",self.I_K)
-        print("\n")
-
-        
-        self.I_U = self.I_H[0:self.unknownNodes]
-        print("I_U",self.I_U)
-
         print("\n ///////////////////////////////////////// \n")
 
 
+    def Vkupdate(self,TheTime):
+        i=0
+        for obj in self.comp_list:
+            if obj.brnType=="S":
+                obj.Sourceupdate(TheTime)
+                self.V_K[0]=obj.ihistory
+                i=i+1
 
 
-
-
-    def calcBrnHistory(self,TheTime):
+    def calcBrnHistory(self):
         for obj in self.comp_list:
             if obj.brnType=="R":
                obj.ihistory=0.0
             elif obj.brnType=="S":
-                obj.Sourceupdate(TheTime)
+                pass
                 #print("source hisory",obj.ihistory)
             elif obj.brnType=="L":
                 obj.ihistory=obj.Ilast+obj.Vlast/obj.Reff
@@ -173,9 +168,24 @@ class Network:
 
         print("I_H",self.I_H)
 
+    def Idivide(self):
+
+        self.I_K=self.I_H[0:self.src_cont]
+        print("I_K",self.I_K)
+        print("\n")
+        
+        self.I_U = self.I_H[0:self.unknownNodes]
+        print("I_U",self.I_U)
+        print("\n ///////////////////////////////////////// \n")
+
+    def calIUnew(self):
+        self.I_U_new= self.I_U - np.matmul(self.G_UK,self.V_K)
+        print("I_U_new",self.I_U_new)
+
+
     def calcnewV(self):
-        self.V_U=np.linalg.solve(self.G_UU, self.I_U ) 
-        print("Vn",self.V_U)
+        self.V_U=np.linalg.solve(self.G_UU, self.I_U_new ) 
+        print("V_U",self.V_U)
 
 
     def reconstruct_V(self):
@@ -185,11 +195,10 @@ class Network:
     def reconstruct_I(self):
         print("IU",self.I_U)
         print("IK",self.I_K)
-        self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K)-self.I_H[self.unknownNodes:self.numNodes] 
-        self.I_U = self.I_U - np.matmul(self.G_UK,self.V_K)
+        self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K) 
         self.I_H=np.concatenate([self.I_U,self.I_K])
         print("I_H",self.I_H)
-        print("delthis",self.I_H[self.unknownNodes:self.numNodes] )
+        #print("delthis",self.I_H[self.unknownNodes:self.numNodes] )
 
 
 

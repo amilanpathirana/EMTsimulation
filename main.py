@@ -12,17 +12,20 @@ def run():
     EMTDC.formG()
     EMTDC.Gdivide()
     EMTDC.LU()
+    EMTDC.Vdivide()
 
     while Time<config.stpTime:
-        
-        EMTDC.IVdevide()
-        EMTDC.calcBrnHistory(Time)
+
+        EMTDC.Vkupdate(Time)        
+        EMTDC.calcBrnHistory()
         EMTDC.calcinjection()
+        EMTDC.Idivide()
+        EMTDC.calIUnew()
         EMTDC.calcnewV()
         EMTDC.reconstruct_V()
         EMTDC.reconstruct_I()
         EMTDC.calcNewbranchI()
-        EMTDC.recordv(2)
+        EMTDC.recordv(3)
         
         Time=Time+config.Dt
 
