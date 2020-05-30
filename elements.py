@@ -39,7 +39,7 @@ class Source():
 
 
     def Sourceupdate(self,TheTime):
-        self.ihistory = self.magnitude*np.sin(2.0*np.pi*self.frequency*TheTime + self.angle*np.pi/180.0)
+        self.ihistory = self.magnitude*np.cos(2.0*np.pi*self.frequency*TheTime + self.angle*np.pi/180.0)
         #print("sourceupdate method clled",self.ihistory)
 
 

@@ -193,28 +193,11 @@ class Network:
         print("Vn",self.Vn)
 
     def reconstruct_I(self):
-        print("IU",self.I_U)
-        print("IK",self.I_K)
+
         self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K) 
         self.I_H=np.concatenate([self.I_U,self.I_K])
         print("I_H",self.I_H)
         #print("delthis",self.I_H[self.unknownNodes:self.numNodes] )
-
-
-
-    def recordv(self,node):
-        self.trace.append(self.Vn[node-1])
-
-    def plotv(self):
-        plt.close('all')
-        plt.plot(self.trace)
-        plt.show()
-
-
-
-
-
-
 
     def calcNewbranchI(self):
         for obj in self.comp_list:
@@ -232,13 +215,22 @@ class Network:
             if obj.brnType == "R":
                 obj.I_last = V/obj.Reff
             elif obj.brnType == "S":
-                obj.I_last = V/obj.Reff+obj.ihistory
+                obj.I_last = V/obj.Reff
             elif obj.brnType == "L":
                 obj.I_last = V/obj.Reff + obj.ihistory
             elif obj.brnType == "C":
                 obj.I_last = V/obj.Reff + obj.ihistory
 
 
+
+
+    def recordv(self,node):
+        self.trace.append(self.Vn[node-1])
+
+    def plotv(self):
+        plt.close('all')
+        plt.plot(self.trace)
+        plt.show()
 
             
 

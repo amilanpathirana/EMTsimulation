@@ -25,7 +25,7 @@ def run():
         EMTDC.reconstruct_V()
         EMTDC.reconstruct_I()
         EMTDC.calcNewbranchI()
-        EMTDC.recordv(3)
+        EMTDC.recordv(2)
         
         Time=Time+config.Dt
 
