@@ -118,13 +118,11 @@ class Network:
         print("\n")
 
         self.I_K=self.I_H[0:self.src_cont]
-        self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K)-self.I_H[self.unknownNodes:self.numNodes] 
         print("I_K",self.I_K)
         print("\n")
 
         
         self.I_U = self.I_H[0:self.unknownNodes]
-        self.I_U = self.I_U - np.matmul(self.G_UK,self.V_K)
         print("I_U",self.I_U)
 
         print("\n ///////////////////////////////////////// \n")
@@ -187,7 +185,8 @@ class Network:
     def reconstruct_I(self):
         print("IU",self.I_U)
         print("IK",self.I_K)
-        self.I_K=self.G_KU*self.V_U+self.G_KK*self.V_K-self.I_H[self.unknownNodes:self.numNodes] 
+        self.I_K=np.matmul(self.G_KU,self.V_U)+ np.matmul(self.G_KK,self.V_K)-self.I_H[self.unknownNodes:self.numNodes] 
+        self.I_U = self.I_U - np.matmul(self.G_UK,self.V_K)
         self.I_H=np.concatenate([self.I_U,self.I_K])
         print("I_H",self.I_H)
         print("delthis",self.I_H[self.unknownNodes:self.numNodes] )
@@ -224,7 +223,7 @@ class Network:
             if obj.brnType == "R":
                 obj.I_last = V/obj.Reff
             elif obj.brnType == "S":
-                obj.I_last = V/obj.Reff
+                obj.I_last = V/obj.Reff+obj.ihistory
             elif obj.brnType == "L":
                 obj.I_last = V/obj.Reff + obj.ihistory
             elif obj.brnType == "C":
