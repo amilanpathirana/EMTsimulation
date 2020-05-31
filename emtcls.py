@@ -216,6 +216,7 @@ class Network:
                 obj.I_last = V/obj.Reff
             elif obj.brnType == "S":
                 obj.I_last = V/obj.Reff
+                #obj.I_last = 0.0
             elif obj.brnType == "L":
                 obj.I_last = V/obj.Reff + obj.ihistory
             elif obj.brnType == "C":
