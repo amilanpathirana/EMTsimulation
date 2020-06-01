@@ -1,7 +1,7 @@
 ___
 
 
-# DommelSim
+# DommelSim by Amila Pathirana
 ___
 Free EMT simulation program based on Domels algorithm
 ---
