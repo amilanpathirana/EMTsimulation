@@ -13,12 +13,15 @@ class RLC():
         if self.brnType=="R":
             self.Reff=value
             self.ihistory=0.0
+            print(self.Reff)
         elif self.brnType=="L":
-            self.Reff=2*value/config.Dt
+            self.Reff=(2*value)/config.Dt
             self.ihistory=self.Ilast+self.Vlast/self.Reff
+            print(self.Reff)
         elif self.brnType=="C":
-            self.Reff=config.Dt/2*value
+            self.Reff=config.Dt/(2*value)
             self.ihistory=-self.Ilast-self.Vlast/self.Reff
+            print(self.Reff)
         else:
             print("R L C only")
 
@@ -31,8 +34,10 @@ class Source():
         self.angle= angle
         self.frequency= frequency
         self.Reff=value
+        #print(self.Reff)
         self.Vlast=0.0
         self.ihistory=0.0
+        print(self.Reff)
 
 
 

@@ -10,6 +10,8 @@ def run():
 
     EMTDC=emtcls.Network()
     EMTDC.formG()
+
+    
     EMTDC.Gdivide()
     EMTDC.LU()
     EMTDC.Vdivide()
@@ -25,7 +27,7 @@ def run():
         EMTDC.reconstruct_V()
         EMTDC.reconstruct_I()
         EMTDC.calcNewbranchI()
-        EMTDC.recordv(2)
+        EMTDC.recordv(1)
         Time=Time+config.Dt
 
     EMTDC.plotv()

@@ -30,6 +30,7 @@ class Network:
         self.unknownNodes=self.numNodes-self.src_cont
         self.numBranches=len(self.comp_list)
 
+
         self.G = np.zeros((self.numNodes,self.numNodes))
         
         self.Vn=np.zeros((self.numNodes, 1))
@@ -68,7 +69,7 @@ class Network:
 
             To=To-1
             From=From-1
-
+            print(obj.Reff)
             if obj.Series==1:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
                 self.G[From,From] = self.G[From,From] + 1/obj.Reff
@@ -76,6 +77,8 @@ class Network:
                 self.G[To,From] = self.G[To,From] - 1/obj.Reff
             else:
                 self.G[To,To] = self.G[To,To] + 1/obj.Reff
+
+            #print(self.G)
             
         print("Conductance matrix:\n ",self.G,"\n")
         print("IH",self.I_H,"\n")
